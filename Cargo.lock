@@ -3437,6 +3437,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "my_plugin"
+version = "0.1.0"
+dependencies = [
+ "nih_plug",
+]
+
+[[package]]
 name = "naga"
 version = "25.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
