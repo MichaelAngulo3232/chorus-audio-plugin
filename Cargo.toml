@@ -17,7 +17,7 @@ members = [
   "nih_plug_egui",
   "nih_plug_iced",
   "nih_plug_vizia",
-  "plugins/my_plugin",
+  "plugins/chorus", # added by Pyfessional
   "nih_plug_xtask",
 
   "cargo_nih_plug",
@@ -44,7 +44,7 @@ members = [
   "plugins/loudness_war_winner",
   "plugins/puberty_simulator",
   "plugins/safety_limiter",
-  "plugins/spectral_compressor", "plugins/my_plugin",
+  "plugins/spectral_compressor",
 ]
 
 [features]

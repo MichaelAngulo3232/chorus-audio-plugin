@@ -1,7 +1,7 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
 
-struct chorus {
+struct Chorus {
     delay_buffer: Vec<f32>,
     write_pos: usize,
     lfo_phase: f32,
