@@ -52,11 +52,24 @@ impl Plugin for Chorus {
         self.delay_buffer.fill(0.0);
     }
 
-    
+    fn process(
+        &mut self,
+        buffer: &mut Buffer,
+        _aux: &mut AuxilaryBuffers
+    ) -> ProcessStatus {
+
+        let rate = 0.25;
+        let depth = 0.01;
+        let mix = 0.5;
+
+        let delay_buffer_len = self.delay_buffer.len();
+        
 
 
 
 
 
+
+    }
    // End of Plugin block 
 }
