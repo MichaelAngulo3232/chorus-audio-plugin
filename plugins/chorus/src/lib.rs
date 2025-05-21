@@ -40,7 +40,7 @@ impl Plugin for Chorus {
         buffer_config: &BufferConfig,
         _config: &mut impl InitContext<self>,
     ) -> bool {
-        self.sample_rate = buffer_config.sample_rate
+        self.sample_rate = buffer_config.sample_rate;
         let max_delay_samples = (0.02 * self.sample_rate) as usize;
         self.delay_buffer = vec![0.0; max_delay_samples];
         true
@@ -55,7 +55,7 @@ impl Plugin for Chorus {
     fn process(
         &mut self,
         buffer: &mut Buffer,
-        _aux: &mut AuxilaryBuffers
+        _aux: &mut AuxiliaryBuffers
     ) -> ProcessStatus {
 
         let rate = 0.25;
@@ -63,13 +63,20 @@ impl Plugin for Chorus {
         let mix = 0.5;
 
         let delay_buffer_len = self.delay_buffer.len();
-        
+        let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
+
+        for channel_samples in buffer.iter_samples() {
+            for samples in channel_samples {
+
+                // chorus execution logic lives here
 
 
 
 
-
-
+            }
+            // End of 
+        }
+        // End of process block
     }
-   // End of Plugin block 
+    // End of Plugin block 
 }
