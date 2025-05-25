@@ -21,6 +21,12 @@ impl Default for Chorus {
     }
 }
 
+// empty params for chorus
+
+#[derive(Default, Params)]
+struct ChorusParams {}
+
+
 impl Plugin for Chorus {
     
     const NAME: &'static str = "Crimson";
@@ -29,16 +35,29 @@ impl Plugin for Chorus {
     const EMAIL: &'static str = "N/A";
     const VERSION: &'static str = "0.1.0";
 
+    const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
+        main_input_channels: NonZeroU32::new(2),
+        main_output_channels: NonZeroU32::new(2),
+        aux_input_ports: &[],
+        aux_output_ports: &[],
+
+        ..AudioIOLayout::const_default()
+    }
+    ];
+
+
     type SysExMessage = ();
+    type BackgroundTask = ();
 
     fn params(&self) -> Arc<dyn Params> {
-        Arc::new(EmptyParams)
+        Arc::new(ChorusParams::default())
     }
 
     fn initialize(
         &mut self, 
+        _audio_io_layout: &AudioIOLayout,
         buffer_config: &BufferConfig,
-        _config: &mut impl InitContext<self>,
+        _context: &mut impl InitContext<Self>,
     ) -> bool {
         self.sample_rate = buffer_config.sample_rate;
         let max_delay_samples = (0.02 * self.sample_rate) as usize;
@@ -55,7 +74,9 @@ impl Plugin for Chorus {
     fn process(
         &mut self,
         buffer: &mut Buffer,
-        _aux: &mut AuxiliaryBuffers
+        _aux: &mut AuxiliaryBuffers,
+        _context: &mut impl ProcessContext<Self>
+
     ) -> ProcessStatus {
 
         let rate = 0.25;
@@ -69,14 +90,12 @@ impl Plugin for Chorus {
             for samples in channel_samples {
 
                 // chorus execution logic lives here
-
-
-
+                
 
             }
-            // End of 
+            // End of Samples Block
         }
-        // End of process block
+        // End of Channels block
     }
     // End of Plugin block 
 }
