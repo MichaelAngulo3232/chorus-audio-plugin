@@ -88,8 +88,19 @@ impl Plugin for Chorus {
 
         for channel_samples in buffer.iter_samples() {
             for samples in channel_samples {
-
+                
                 // chorus execution logic lives here
+                let lfo = self.lfo_phase.sin();
+                let mod_delay = (depth * self.sample_rate * (0.5 * (lfo + 1.0))) as usize;
+                let read_pos = (self.write_pos + delay_buffer_len - mod_delay) % delay_buffer_len;
+                let delayed_sample = self.delayed_buffer[read_pos];
+
+                // write the current position
+                self.delay_buffer[self.write_pos] = *sample;
+
+
+
+                
                 
 
             }
