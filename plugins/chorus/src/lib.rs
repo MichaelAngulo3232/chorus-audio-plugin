@@ -87,26 +87,46 @@ impl Plugin for Chorus {
         let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
 
         for channel_samples in buffer.iter_samples() {
-            for samples in channel_samples {
+            for sample in channel_samples {
                 
                 // chorus execution logic lives here
                 let lfo = self.lfo_phase.sin();
                 let mod_delay = (depth * self.sample_rate * (0.5 * (lfo + 1.0))) as usize;
                 let read_pos = (self.write_pos + delay_buffer_len - mod_delay) % delay_buffer_len;
-                let delayed_sample = self.delayed_buffer[read_pos];
+                let delayed_sample = self.delay_buffer[read_pos];
 
                 // write the current position
                 self.delay_buffer[self.write_pos] = *sample;
 
+                // Mix dry/wet
+                let wet = delayed_sample;
+                let dry = *sample;
+                *sample = mix * wet + (1.0 - mix) * dry ;
 
-
-                
-                
+                // advance the write head and LFO
+                self.write_pos = (self.write_pos + 1) % delay_buffer_len;
+                self.lfo_phase = (self.lfo_phase + lfo_increment) % std::f32::consts::TAU;
 
             }
-            // End of Samples Block
+            // End of Samples block
         }
         // End of Channels block
+        ProcessStatus::Normal
+
     }
-    // End of Plugin block 
+    // End of Process block 
 }
+
+// End of Plugin block
+
+impl ClapPlugin for Chorus {
+    const CLAP_ID: &'static str = "pyfessional.tech/crimson";
+    const CLAP_DESCRIPTION: Option<&'static str> = None;
+    const CLAP_MANUAL_URL: Option<&'static str> = None;
+    const CLAP_SUPPORT_URL: Option<&'static str> = None;
+    const CLAP_FEATURES: &'static [ClapFeature] = &[];
+}
+
+// EXPORTS
+nih_export_clap!(Chorus);
+// nih_export_vst3!(Chorus);
