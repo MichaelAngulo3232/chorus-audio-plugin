@@ -1,11 +1,27 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
 
+// structure for chorus plugin
+
 struct Chorus {
     delay_buffer: Vec<f32>,
     write_pos: usize,
     lfo_phase: f32,
     sample_rate: f32
+}
+
+
+// structure for the chorus params
+#[derive(Params)]
+struct ChorusParams {
+    #[id = "rate"]
+    pub rate: FloatParam,
+
+    #[id = "depth"]
+    pub depth: FloatParam, 
+
+    #[id = "mix"]
+    pub mix: FloatParam,
 }
 
 impl Default for Chorus {
