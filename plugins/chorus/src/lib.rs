@@ -37,11 +37,6 @@ impl Default for Chorus {
     }
 }
 
-// empty params for chorus
-
-#[derive(Default, Params)]
-struct ChorusParams {}
-
 
 impl Plugin for Chorus {
     
