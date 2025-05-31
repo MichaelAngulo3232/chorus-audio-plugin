@@ -129,7 +129,6 @@ impl Plugin for Chorus {
 
         let delay_buffer_len = self.delay_buffer.len();
 
-
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
 
