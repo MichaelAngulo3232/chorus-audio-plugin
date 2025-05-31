@@ -1,17 +1,8 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
+use nih_plug::params::range::FloatRange;
 
-// structure for chorus plugin
-
-struct Chorus {
-    delay_buffer: Vec<f32>,
-    write_pos: usize,
-    lfo_phase: f32,
-    sample_rate: f32
-}
-
-
-// structure for the chorus params
+// structure for chorus params
 #[derive(Params)]
 struct ChorusParams {
     #[id = "rate"]
@@ -24,6 +15,49 @@ struct ChorusParams {
     pub mix: FloatParam,
 }
 
+impl Default for ChorusParams {
+
+        fn default() -> Self {
+
+            let rate_default = 0.25;
+            let rate_min = 0.01;
+            let rate_max = 5.0;
+
+            let depth_default = 0.01;
+            let depth_min = 0.0;
+            let depth_max = 0.02;
+
+            let mix_default = 0.5;
+            let mix_min = 0.0;
+            let mix_max = 1.0;
+
+            Self {
+                
+                rate: FloatParam::new("Rate", rate_default, FloatRange::Linear{min: rate_min, max: rate_max})
+                    .with_unit("Hz") // UI Unit for Rate
+                    .with_smoother(SmoothingStyle::Linear(40.0)), // snappier than 50.0
+                
+                depth: FloatParam::new("Depth", depth_default, FloatRange::Linear{min: depth_min, max: depth_max})
+                    .with_unit("s") // UI Unit for Depth
+                    .with_smoother(SmoothingStyle::Linear(50.0)), // 40.0 not worth trade off - will introduce artifacts
+
+                mix: FloatParam::new("Mix", mix_default, FloatRange::Linear{min: mix_min, max: mix_max})
+                    .with_unit("%")
+                    .with_value_to_string(Arc::new(|val| format!("{:.0}", val *100.0)))
+                    .with_smoother(SmoothingStyle::Linear(50.0)),
+        }
+    }
+}
+
+// structure for chorus plugin
+struct Chorus {
+    delay_buffer: Vec<f32>,
+    write_pos: usize,
+    lfo_phase: f32,
+    sample_rate: f32,
+    params: Arc<ChorusParams>,
+}
+
 impl Default for Chorus {
 
     fn default() -> Self {
@@ -33,6 +67,7 @@ impl Default for Chorus {
             write_pos: 0,
             lfo_phase: 0.0,
             sample_rate: 48000.0,
+            params: Arc::new(ChorusParams::default()),
         }
     }
 }
@@ -61,7 +96,7 @@ impl Plugin for Chorus {
     type BackgroundTask = ();
 
     fn params(&self) -> Arc<dyn Params> {
-        Arc::new(ChorusParams::default())
+        self.params.clone()
     }
 
     fn initialize(
@@ -90,9 +125,9 @@ impl Plugin for Chorus {
 
     ) -> ProcessStatus {
 
-        let rate = 0.25;
-        let depth = 0.01;
-        let mix = 0.5;
+        let rate = self.params.rate.value();
+        let depth = self.params.depth.value();
+        let mix = self.params.mix.value();
 
         let delay_buffer_len = self.delay_buffer.len();
         let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
@@ -112,7 +147,7 @@ impl Plugin for Chorus {
                 // Mix dry/wet
                 let wet = delayed_sample;
                 let dry = *sample;
-                *sample = mix * wet + (1.0 - mix) * dry ;
+                *sample = (mix * wet + (1.0 - mix) * dry).clamp(-1.0, 1.0);
 
                 // advance the write head and LFO
                 self.write_pos = (self.write_pos + 1) % delay_buffer_len;
