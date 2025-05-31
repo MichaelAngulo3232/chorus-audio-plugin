@@ -127,17 +127,17 @@ impl Plugin for Chorus {
 
     ) -> ProcessStatus {
 
-        let rate = self.params.rate.smoothed.next();
-        let depth = self.params.depth.smoothed.next();
-        let mix = self.params.mix.smoothed.next();
-
         let delay_buffer_len = self.delay_buffer.len();
-        let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
+
 
         for channel_samples in buffer.iter_samples() {
             for sample in channel_samples {
-                
+
+                let rate = self.params.rate.smoothed.next();
+                let depth = self.params.depth.smoothed.next();
+                let mix = self.params.mix.smoothed.next();
                 // chorus execution logic lives here
+                let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
                 let lfo = self.lfo_phase.sin();
 
                 // mod_delay ranges from 0 to depth * sample_rate (e.g., 0 to 960 samples if depth = 0.02 and SR = 48kHz)
