@@ -125,9 +125,9 @@ impl Plugin for Chorus {
 
     ) -> ProcessStatus {
 
-        let rate = self.params.rate.value();
-        let depth = self.params.depth.value();
-        let mix = self.params.mix.value();
+        let rate = self.params.rate.smoothed.next();
+        let depth = self.params.depth.smoothed.next();
+        let mix = self.params.mix.smoothed.next();
 
         let delay_buffer_len = self.delay_buffer.len();
         let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
@@ -137,9 +137,18 @@ impl Plugin for Chorus {
                 
                 // chorus execution logic lives here
                 let lfo = self.lfo_phase.sin();
+
+
+
+                
                 let mod_delay = (depth * self.sample_rate * (0.5 * (lfo + 1.0))) as usize;
                 let read_pos = (self.write_pos + delay_buffer_len - mod_delay) % delay_buffer_len;
                 let delayed_sample = self.delay_buffer[read_pos];
+
+
+
+
+
 
                 // write the current position
                 self.delay_buffer[self.write_pos] = *sample;
