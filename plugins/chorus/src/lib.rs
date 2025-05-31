@@ -1,6 +1,19 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
 use nih_plug::params::range::FloatRange;
+use nih_plug_egui::egui;
+use nih_plug_egui::create_egui_editor;
+
+// GUI editor structure that holds a reference to the plugins params
+struct ChorusEditor {
+    params: Arc<ChorusParams>,
+}
+
+// Implement Editor trait so the plugin knows how to launch the GUI
+impl Editor for ChorusEditor {
+
+}
+
 
 // structure for chorus params
 #[derive(Params)]
