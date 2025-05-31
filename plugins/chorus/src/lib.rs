@@ -35,10 +35,12 @@ impl Default for ChorusParams {
                 
                 rate: FloatParam::new("Rate", rate_default, FloatRange::Linear{min: rate_min, max: rate_max})
                     .with_unit("Hz") // UI Unit for Rate
+                    .with_value_to_string(Arc::new(|val| format!("{:.1}", val)))
                     .with_smoother(SmoothingStyle::Linear(40.0)), // snappier than 50.0
                 
                 depth: FloatParam::new("Depth", depth_default, FloatRange::Linear{min: depth_min, max: depth_max})
-                    .with_unit("s") // UI Unit for Depth
+                    .with_unit("ms") // UI Unit for Depth
+                    .with_value_to_string(Arc::new(|val| format!("{:.0}", val *1000.0)))
                     .with_smoother(SmoothingStyle::Linear(50.0)), // 40.0 not worth trade off - will introduce artifacts
 
                 mix: FloatParam::new("Mix", mix_default, FloatRange::Linear{min: mix_min, max: mix_max})
@@ -138,17 +140,13 @@ impl Plugin for Chorus {
                 // chorus execution logic lives here
                 let lfo = self.lfo_phase.sin();
 
-
-
-                
-                let mod_delay = (depth * self.sample_rate * (0.5 * (lfo + 1.0))) as usize;
-                let read_pos = (self.write_pos + delay_buffer_len - mod_delay) % delay_buffer_len;
-                let delayed_sample = self.delay_buffer[read_pos];
-
-
-
-
-
+                // mod_delay ranges from 0 to depth * sample_rate (e.g., 0 to 960 samples if depth = 0.02 and SR = 48kHz)
+                let mod_delay = depth * self.sample_rate * (0.5 * (lfo + 1.0));
+                let read_pos = (self.write_pos as f32 + delay_buffer_len as f32 - mod_delay) % delay_buffer_len as f32;
+                let index_a = read_pos.floor() as usize;
+                let index_b = (index_a + 1) % delay_buffer_len;
+                let frac = read_pos - index_a as f32;
+                let delayed_sample = (1.0 - frac) * self.delay_buffer[index_a] + frac * self.delay_buffer[index_b];
 
                 // write the current position
                 self.delay_buffer[self.write_pos] = *sample;
