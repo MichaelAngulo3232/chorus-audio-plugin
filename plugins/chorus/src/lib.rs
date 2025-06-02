@@ -2,6 +2,24 @@ use nih_plug::prelude::*;
 use std::sync::Arc;
 use nih_plug::params::range::FloatRange;
 
+
+
+#[derive(Enum, Debug, PartialEq)] 
+enum WaveType {
+
+    #[name = "Sine"]
+    Sine,
+    #[name = "Triangle"] 
+    Triangle,
+    #[name = "Square"]
+    Square,
+    #[name = "Sawtooth"]
+    Sawtooth,
+}
+
+
+
+
 // structure for chorus params
 #[derive(Params)]
 struct ChorusParams {
@@ -13,6 +31,9 @@ struct ChorusParams {
 
     #[id = "mix"]
     pub mix: FloatParam,
+
+    #[id = "wave_type"]
+    pub wave_type: EnumParam<WaveType>
 }
 
 impl Default for ChorusParams {
@@ -47,6 +68,8 @@ impl Default for ChorusParams {
                     .with_unit("%")
                     .with_value_to_string(Arc::new(|val| format!("{:.0}", val *100.0)))
                     .with_smoother(SmoothingStyle::Linear(50.0)),
+
+                wave_type: EnumParam::new("Wave", WaveType::Sine),
         }
     }
 }
@@ -137,7 +160,39 @@ impl Plugin for Chorus {
                 let mix = self.params.mix.smoothed.next();
                 // chorus execution logic lives here
                 let lfo_increment = rate * std::f32::consts::TAU / self.sample_rate;
-                let lfo = self.lfo_phase.sin();
+                
+                
+                let lfo = match self.params.wave_type.value() {
+                    
+                    WaveType::Sine => self.lfo_phase.sin(),
+                    
+                    // Ultra-smooth triangle (just enough harmonics)
+                    WaveType::Triangle => {
+                        let s1 = self.lfo_phase.sin();
+                        let s3 = (3.0 * self.lfo_phase).sin() / 9.0;
+                        let s5 = (5.0 * self.lfo_phase).sin() / 25.0;
+                        let s7 = (7.0 * self.lfo_phase).sin() / 49.0;
+                        (s1 - s3 + s5 - s7) * 0.81 // Scale factor for proper amplitude
+                    },
+                    
+                    // Ultra-smooth square
+                    WaveType::Square => {
+                        let s1 = self.lfo_phase.sin();
+                        let s3 = (3.0 * self.lfo_phase).sin() / 3.0;
+                        let s5 = (5.0 * self.lfo_phase).sin() / 5.0;
+                        let s7 = (7.0 * self.lfo_phase).sin() / 7.0;
+                        (s1 + s3 + s5 + s7) * 0.64 // Scale factor
+                    },
+
+                    // Ultra-smooth sawtooth
+                    WaveType::Sawtooth => {
+                        let s1 = self.lfo_phase.sin();
+                        let s2 = (2.0 * self.lfo_phase).sin() / 2.0;
+                        let s3 = (3.0 * self.lfo_phase).sin() / 3.0;
+                        let s4 = (4.0 * self.lfo_phase).sin() / 4.0;
+                        (s1 - s2 + s3 - s4) * 0.64 // Scale factor
+                    },
+                };
 
                 // mod_delay ranges from 0 to depth * sample_rate (e.g., 0 to 960 samples if depth = 0.02 and SR = 48kHz)
                 let mod_delay = depth * self.sample_rate * (0.5 * (lfo + 1.0));
