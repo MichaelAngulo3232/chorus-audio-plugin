@@ -76,6 +76,7 @@ struct Chorus {
     lfo_phase: f32,
     sample_rate: f32,
     params: Arc<ChorusParams>,
+    smooth_state: f32,
 }
 
 impl Default for Chorus {
@@ -88,6 +89,7 @@ impl Default for Chorus {
             lfo_phase: 0.0,
             sample_rate: 48000.0,
             params: Arc::new(ChorusParams::default()),
+            smooth_state: 0.0,
         }
     }
 }
@@ -135,6 +137,7 @@ impl Plugin for Chorus {
         self.write_pos = 0;
         self.lfo_phase = 0.0;
         self.delay_buffer.fill(0.0);
+        self.smooth_state = 0.0;
     }
 
     fn process(
@@ -201,7 +204,15 @@ impl Plugin for Chorus {
                 self.delay_buffer[self.write_pos] = *sample;
 
                 // Mix dry/wet
-                let wet = delayed_sample;
+
+                // smoothen the wet signal even more with one pole low pass filter
+                let mut wet = delayed_sample;
+
+                let smooth_amount = 0.1 + 0.4 * (lfo * 0.5 + 0.5);
+                self.smooth_state += smooth_amount * (wet - self.smooth_state);
+                wet = self.smooth_state;
+
+
                 let dry = *sample;
                 *sample = (mix * wet + (1.0 - mix) * dry).clamp(-1.0, 1.0);
 
