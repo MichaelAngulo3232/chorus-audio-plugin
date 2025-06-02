@@ -2,8 +2,6 @@ use nih_plug::prelude::*;
 use std::sync::Arc;
 use nih_plug::params::range::FloatRange;
 
-
-
 #[derive(Enum, Debug, PartialEq)] 
 enum WaveType {
 
@@ -16,9 +14,6 @@ enum WaveType {
     #[name = "Sawtooth"]
     Sawtooth,
 }
-
-
-
 
 // structure for chorus params
 #[derive(Params)]
