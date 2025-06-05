@@ -3,8 +3,14 @@ use nih_plug_iced::widgets as nih_widgets;
 use nih_plug_iced::*;
 use std::sync::Arc;
 use std::time::Duration;
-
+use nih_plug_iced::Font;
 use crate::ChorusParams;
+
+// This .ttf file is needed to use NotoSansMono font to display nice ASCII art lettering
+pub const NOTO_SANS_MONO: Font = Font::External {
+    name: "NotoSansMono",
+    bytes: include_bytes!("../assets/NotoSansMono-Regular.ttf"),
+};
 
 // Makes sense to also define this here, makes it a bit easier to keep track of
 pub(crate) fn default_state() -> Arc<IcedState> {
@@ -74,13 +80,17 @@ impl IcedEditor for ChorusEditor {
         Column::new()
             .align_items(Alignment::Center)
             .push(
-                Text::new("Chorus GUI")
-                    .font(assets::NOTO_SANS_LIGHT)
-                    .size(40)
-                    .height(50.into())
-                    .width(Length::Fill)
-                    .horizontal_alignment(alignment::Horizontal::Center)
-                    .vertical_alignment(alignment::Vertical::Bottom),
+                Text::new("
+ ██████╗██████╗ ██╗███╗   ███╗███████╗ ██████╗ ███╗   ██╗
+██╔════╝██╔══██╗██║████╗ ████║██╔════╝██╔═══██╗████╗  ██║
+██║     ██████╔╝██║██╔████╔██║███████╗██║   ██║██╔██╗ ██║
+██║     ██╔══██╗██║██║╚██╔╝██║╚════██║██║   ██║██║╚██╗██║
+╚██████╗██║  ██║██║██║ ╚═╝ ██║███████║╚██████╔╝██║ ╚████║
+ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝")
+        .font(NOTO_SANS_MONO)
+        .size(12)
+        .color(Color::from_rgb(0.9, 0.2, 0.2)) // Bright red
+        .horizontal_alignment(alignment::Horizontal::Center)
             )
             .push(
                 Text::new("Rate")
