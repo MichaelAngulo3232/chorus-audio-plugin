@@ -1,6 +1,8 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
 use nih_plug::params::range::FloatRange;
+use nih_plug_iced::IcedState;
+mod editor;
 
 #[derive(Enum, Debug, PartialEq)] 
 enum WaveType {
@@ -18,6 +20,10 @@ enum WaveType {
 // structure for chorus params
 #[derive(Params)]
 struct ChorusParams {
+
+    #[persist = "editor-state"]
+    editor_state: Arc<IcedState>,
+
     #[id = "rate"]
     pub rate: FloatParam,
 
@@ -48,6 +54,8 @@ impl Default for ChorusParams {
             let mix_max = 1.0;
 
             Self {
+
+                editor_state: editor::default_state(),
                 
                 rate: FloatParam::new("Rate", rate_default, FloatRange::Linear{min: rate_min, max: rate_max})
                     .with_unit("Hz") // UI Unit for Rate
@@ -119,6 +127,13 @@ impl Plugin for Chorus {
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
+    }
+
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+    editor::create(
+        self.params.clone(),
+        self.params.editor_state.clone(),
+        )
     }
 
     fn initialize(

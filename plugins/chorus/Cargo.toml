@@ -8,4 +8,4 @@ crate-type = ["cdylib"]    # build as a plugin library
 
 [dependencies]
 nih_plug = { path = "/Users/miclo/Desktop/GitProjects/rust-audio-plugin/chorus-audio-plugin" }
-nih_plug_egui = { path = "/Users/miclo/Desktop/GitProjects/rust-audio-plugin/chorus-audio-plugin/nih_plug_egui" }
+nih_plug_iced = { path = "/Users/miclo/Desktop/GitProjects/rust-audio-plugin/chorus-audio-plugin/nih_plug_iced" }
