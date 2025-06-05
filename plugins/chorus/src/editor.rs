@@ -87,7 +87,8 @@ impl IcedEditor for ChorusEditor {
                     .height(20.into())
                     .width(Length::Fill)
                     .horizontal_alignment(alignment::Horizontal::Center)
-                    .vertical_alignment(alignment::Vertical::Center),
+                    .vertical_alignment(alignment::Vertical::Center)
+                    .color(Color::from_rgb(1.0, 0.0, 0.0)), // Red
             )
             .push(
                 nih_widgets::ParamSlider::new(&mut self.rate_slider_state, &self.params.rate)
