@@ -7,5 +7,5 @@ edition = "2024"
 crate-type = ["cdylib"]    # build as a plugin library
 
 [dependencies]
-nih_plug = { path = "/Users/miclo/Desktop/GitProjects/rust-audio-plugin/chorus-audio-plugin" }
-nih_plug_iced = { path = "/Users/miclo/Desktop/GitProjects/rust-audio-plugin/chorus-audio-plugin/nih_plug_iced" }
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+nih_plug_iced = { git = "https://github.com/robbert-vdh/nih-plug.git" }
