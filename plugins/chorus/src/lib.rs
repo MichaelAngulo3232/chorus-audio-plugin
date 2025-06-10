@@ -45,12 +45,12 @@ impl Default for ChorusParams {
             let rate_min = 0.01;
             let rate_max = 5.0;
 
-            let depth_default = 0.01;
-            let depth_min = 0.0;
+            let depth_default = 0.012;
+            let depth_min = 0.01;
             let depth_max = 0.02;
 
-            let mix_default = 0.5;
-            let mix_min = 0.0;
+            let mix_default = 0.2;
+            let mix_min = 0.01;
             let mix_max = 1.0;
 
             Self {

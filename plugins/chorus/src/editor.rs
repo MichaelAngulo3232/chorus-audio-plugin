@@ -1,8 +1,7 @@
-use nih_plug::prelude::{util, Editor, GuiContext};
+use nih_plug::prelude::{Editor, GuiContext};
 use nih_plug_iced::widgets as nih_widgets;
 use nih_plug_iced::*;
 use std::sync::Arc;
-use std::time::Duration;
 use nih_plug_iced::Font;
 use crate::ChorusParams;
 
@@ -31,6 +30,8 @@ struct ChorusEditor {
     rate_slider_state: nih_widgets::param_slider::State,
     depth_slider_state: nih_widgets::param_slider::State,
     mix_slider_state: nih_widgets::param_slider::State,
+    wave_type_slider_state: nih_widgets::param_slider::State,
+
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -55,6 +56,7 @@ impl IcedEditor for ChorusEditor {
             rate_slider_state: Default::default(),
             depth_slider_state: Default::default(),
             mix_slider_state: Default::default(),
+            wave_type_slider_state: Default::default(),
         };
 
         (editor, Command::none())
@@ -89,16 +91,17 @@ impl IcedEditor for ChorusEditor {
  ╚═════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝")
         .font(NOTO_SANS_MONO)
         .size(12)
-        .color(Color::from_rgb(0.9, 0.2, 0.2)) // Bright red
+        .color(Color::from_rgb(0.5, 0.1, 0.2)) // Rich burgundy
         .horizontal_alignment(alignment::Horizontal::Center)
             )
+            .push(Space::with_height(20.into()))
             .push(
                 Text::new("Rate")
                     .height(20.into())
                     .width(Length::Fill)
                     .horizontal_alignment(alignment::Horizontal::Center)
                     .vertical_alignment(alignment::Vertical::Center)
-                    .color(Color::from_rgb(1.0, 0.0, 0.0)), // Red
+                    .color(Color::from_rgb(0.5, 0.1, 0.2)), // Rich burgundy
             )
             .push(
                 nih_widgets::ParamSlider::new(&mut self.rate_slider_state, &self.params.rate)
@@ -106,24 +109,56 @@ impl IcedEditor for ChorusEditor {
             )
             .push(Space::with_height(10.into()))
             
-            /*
             .push(
-                nih_widgets::PeakMeter::new(
-                    &mut self.peak_meter_state,
-                    util::gain_to_db(self.peak_meter.load(std::sync::atomic::Ordering::Relaxed)),
-                )
-                .hold_time(Duration::from_millis(600)),
+                Text::new("Depth")
+                    .height(20.into())
+                    .width(Length::Fill)
+                    .horizontal_alignment(alignment::Horizontal::Center)
+                    .vertical_alignment(alignment::Vertical::Center)
+                    .color(Color::from_rgb(0.5, 0.1, 0.2)), // Rich burgundy
             )
-            */
-
+            .push(
+                nih_widgets::ParamSlider::new(&mut self.depth_slider_state, &self.params.depth)
+                    .map(Message::ParamUpdate),
+            )
+            .push(Space::with_height(10.into()))
+            
+            .push(
+                Text::new("Mix")
+                    .height(20.into())
+                    .width(Length::Fill)
+                    .horizontal_alignment(alignment::Horizontal::Center)
+                    .vertical_alignment(alignment::Vertical::Center)
+                    .color(Color::from_rgb(0.5, 0.1, 0.2)), // Rich burgundy
+            )
+            .push(
+                nih_widgets::ParamSlider::new(&mut self.mix_slider_state, &self.params.mix)
+                    .map(Message::ParamUpdate),
+            )
+            .push(Space::with_height(10.into()))
+            .push(Space::with_height(10.into()))
+            // Wave Type - using ParamSlider (standard approach for enums in nih_plug_iced)
+            .push(
+                Text::new("Wave Type")
+                    .height(20.into())
+                    .width(Length::Fill)
+                    .horizontal_alignment(alignment::Horizontal::Center)
+                    .vertical_alignment(alignment::Vertical::Center)
+                    .color(Color::from_rgb(0.5, 0.1, 0.2)), // Rich burgundy
+            )
+            .push(
+                nih_widgets::ParamSlider::new(&mut self.wave_type_slider_state, &self.params.wave_type)
+                    .map(Message::ParamUpdate),
+            )
+            .push(Space::with_height(10.into()))
             .into()
     }
 
     fn background_color(&self) -> nih_plug_iced::Color {
         nih_plug_iced::Color {
-            r: 0.07,
-            g: 0.07,
-            b: 0.07,
+            r: 0.75,
+            g: 0.65,
+            b: 0.70,
             a: 1.0,
         }
     }
