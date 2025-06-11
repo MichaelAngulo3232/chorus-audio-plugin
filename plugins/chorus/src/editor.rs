@@ -156,9 +156,9 @@ impl IcedEditor for ChorusEditor {
 
     fn background_color(&self) -> nih_plug_iced::Color {
         nih_plug_iced::Color {
-            r: 0.75,
-            g: 0.65,
-            b: 0.70,
+            r: 0.97,
+            g: 0.96,
+            b: 0.94,
             a: 1.0,
         }
     }
